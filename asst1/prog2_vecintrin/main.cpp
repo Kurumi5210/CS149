@@ -249,7 +249,21 @@ void clampedExpVector(float* values, int* exponents, float* output, int N) {
   // Your solution should work for any value of
   // N and VECTOR_WIDTH, not just when VECTOR_WIDTH divides N
   //
+  __cs149_vec_float y_vec, count_vec;
+  __cs149_vec_int x_vec, result_vec;
+  // 全0
+  __cs149_vec_int zero_int = _cs149_vset_int(0);
+  // 全1
+  __cs149_vec_int one_int = _cs149_vset_int(1);
+  // 上限
+  __cs149_vec_float vecMaxValue = _cs149_vset_float(9.999999f);
+
+  __cs149_mask maskALL, maskIsZero, maskIsNotZero, maskPositive;
   
+  for(int i = 0; i < N - VECTOR_WIDTH + 1; i+=VECTOR_WIDTH)  //先解决能被VECTOR_WIDTH整除的部分
+  {
+
+  }
 }
 
 // returns the sum of all elements in values
