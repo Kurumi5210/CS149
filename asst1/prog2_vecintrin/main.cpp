@@ -248,22 +248,44 @@ void clampedExpVector(float* values, int* exponents, float* output, int N) {
   //
   // Your solution should work for any value of
   // N and VECTOR_WIDTH, not just when VECTOR_WIDTH divides N
-  //
-  __cs149_vec_float y_vec, count_vec;
-  __cs149_vec_int x_vec, result_vec;
-  // 全0
+  // 输入和输出向量
+  __cs149_vec_int y_vec, count_vec;
+  __cs149_vec_float x_vec, result_vec;
+  // 全0和全1的整数向量
   __cs149_vec_int zero_int = _cs149_vset_int(0);
-  // 全1
   __cs149_vec_int one_int = _cs149_vset_int(1);
-  // 上限
+  // 常量上限
   __cs149_vec_float vecMaxValue = _cs149_vset_float(9.999999f);
-
+  // 掩码变量，控制向量操作的作用范围
   __cs149_mask maskALL, maskIsZero, maskIsNotZero, maskPositive;
-  
-  for(int i = 0; i < N - VECTOR_WIDTH + 1; i+=VECTOR_WIDTH)  //先解决能被VECTOR_WIDTH整除的部分
-  {
 
+  for(int i = 0; i < N; i += VECTOR_WIDTH)
+  {
+    maskALL = _cs149_init_ones(N - i);  // 初始化掩码
+    // load
+    _cs149_vload_float(x_vec, values+i, maskALL);
+    _cs149_vload_int(y_vec, exponents+i, maskALL);
+    // 指数为0
+    _cs149_veq_int(maskIsZero, y_vec, zero_int, maskALL); // if(y == 0) {
+    _cs149_vset_float(result_vec, 1.f, maskIsZero);             //  output[i] = 1.f;
+    // 指数不为0
+    maskIsNotZero = _cs149_mask_not(maskIsZero);  // 对maskiszero取反，得到指数不为0的掩码
+    maskIsNotZero = _cs149_mask_and(maskIsNotZero, maskALL);  // else {
+    _cs149_vmove_float(result_vec, x_vec, maskIsNotZero); // float result = x;
+    // 计算指数幂
+    _cs149_vsub_int(y_vec, y_vec, one_int, maskIsNotZero);  // y--
+    while(_cs149_vgt_int(maskIsNotZero, y_vec, zero_int, maskIsNotZero),
+          _cs149_cntbits(maskIsNotZero) > 0) {  // while(count > 0)
+            _cs149_vmult_float(result_vec, result_vec, x_vec, maskIsNotZero); // resule *= x
+            _cs149_vsub_int(y_vec, y_vec, one_int, maskIsNotZero);  // count--;
+          }
+    // 限制结果
+    _cs149_vgt_float(maskPositive, result_vec, vecMaxValue, maskALL);  // if(result > 9.99999f)
+    _cs149_vmove_float(result_vec, vecMaxValue, maskPositive); // result = 9.99999f
+    // store
+    _cs149_vstore_float(output + i, result_vec, maskALL);
   }
+  
 }
 
 // returns the sum of all elements in values
