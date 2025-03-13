@@ -1,0 +1,16 @@
+# 忽略所有编译生成的文件
+*.o
+*.a
+*.so
+*.exe
+*.out
+*.bin
+
+# 忽略编译目录
+/build/
+/dist/
+*.obj
+*.elf
+*.pyc
+*.class
+*.log
