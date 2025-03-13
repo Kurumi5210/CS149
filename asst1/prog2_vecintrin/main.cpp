@@ -4,6 +4,7 @@
 #include <math.h>
 #include "CS149intrin.h"
 #include "logger.h"
+#include <iostream>
 using namespace std;
 
 #define EXP_MAX 10
@@ -306,11 +307,16 @@ float arraySumVector(float* values, int N) {
   //
   // CS149 STUDENTS TODO: Implement your vectorized version of arraySumSerial here
   //
-  
-  for (int i=0; i<N; i+=VECTOR_WIDTH) {
-
+  __cs149_vec_float sum_vec = _cs149_vset_float(0.f), vec;  // float sum = 0;
+  __cs149_mask maskAll = _cs149_init_ones();
+  for(int i = 0; i < N; i+= VECTOR_WIDTH) {
+    _cs149_vload_float(vec, values+i, maskAll);
+    _cs149_vadd_float(sum_vec, sum_vec, vec, maskAll);  // 读取数据到sum中
   }
-
-  return 0.0;
+  // 交错求和
+  for(int stride = VECTOR_WIDTH / 2; stride >= 1; stride /= 2) {
+    _cs149_hadd_float(sum_vec, sum_vec);  // 相邻元素求和
+    _cs149_interleave_float(sum_vec, sum_vec);  // 交错元素位置
+  }
+  return sum_vec.value[0];
 }
-
