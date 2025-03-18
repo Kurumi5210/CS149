@@ -81,6 +81,7 @@ int main(int argc, char** argv) {
     float y1 = 1;
 
     bool useTasks = false;
+    // bool useTasks = true;
 
     // parse commandline options ////////////////////////////////////////////
     int opt;

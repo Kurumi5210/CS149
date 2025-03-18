@@ -56,6 +56,7 @@ export void sqrt_ispc_withtasks(uniform int N,
                                 uniform float output[])
 {
 
+    uniform int task_num = 16;  // 最大核心数
     uniform int span = N / 64;  // 64 tasks
 
     launch[N/span] sqrt_ispc_task(N, span, initialGuess, values, output);
