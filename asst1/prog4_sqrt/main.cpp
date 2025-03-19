@@ -9,6 +9,7 @@
 using namespace ispc;
 
 extern void sqrtSerial(int N, float startGuess, float* values, float* output);
+extern void sqrtAvx(int N, float startGuess, float* values, float* output);
 
 static void verifyResult(int N, float* result, float* gold) {
     for (int i=0; i<N; i++) {
@@ -38,7 +39,7 @@ int main() {
         values[i] = .5f + 2.0f * static_cast<float>(rand()) / RAND_MAX;
         // slowest
         // if(i % 8 == 0)
-        //     values[i] = 2.9999999f;
+        //     values[i] = 2.999f;
         // else
         //     values[i] = 1.0f;
     }
@@ -55,11 +56,22 @@ int main() {
     for (int i = 0; i < 3; ++i) {
         double startTime = CycleTimer::currentSeconds();
         sqrtSerial(N, initialGuess, values, output);
+        // sqrtAvx(N, initialGuess, values, output);
         double endTime = CycleTimer::currentSeconds();
         minSerial = std::min(minSerial, endTime - startTime);
     }
 
     printf("[sqrt serial]:\t\t[%.3f] ms\n", minSerial * 1000);
+
+    double miniAvx = 1e30;
+    for (int i = 0; i < 3; ++i) {
+        double startTime = CycleTimer::currentSeconds();
+        sqrtAvx(N, initialGuess, values, output);
+        double endTime = CycleTimer::currentSeconds();
+        miniAvx = std::min(minSerial, endTime - startTime);
+    }
+
+    printf("[sqrt Avx2]:\t\t[%.3f] ms\n", miniAvx * 1000);
 
     verifyResult(N, output, gold);
 
@@ -98,6 +110,7 @@ int main() {
 
     verifyResult(N, output, gold);
 
+    printf("\t\t\t\t(%.2fx speedup from AVX2)\n", minSerial/miniAvx);
     printf("\t\t\t\t(%.2fx speedup from ISPC)\n", minSerial/minISPC);
     printf("\t\t\t\t(%.2fx speedup from task ISPC)\n", minSerial/minTaskISPC);
 
