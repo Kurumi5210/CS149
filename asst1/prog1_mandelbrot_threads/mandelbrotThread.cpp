@@ -54,6 +54,29 @@ extern void mandelbrotSerial(
 // workerThreadStart --
 //
 // Thread entrypoint.
+
+// void workerThreadStart(WorkerArgs * const args) {
+
+//     // TODO FOR CS149 STUDENTS: Implement the body of the worker
+//     // thread here. Each thread should make a call to mandelbrotSerial()
+//     // to compute a part of the output image.  For example, in a
+//     // program that uses two threads, thread 0 could compute the top
+//     // half of the image and thread 1 could compute the bottom half.
+//     Timer timer(args->threadId);
+//     int startRow = args->height / args->numThreads * args->threadId;
+//     int endRow = startRow + args->height / args->numThreads;
+//     if(args->threadId == args->numThreads-1) {
+//         endRow = args->height;
+//     }
+//     mandelbrotSerial(
+//         args->x0, args->y0, args->x1, args->y1,
+//         args->width, args->height,
+//         startRow, endRow - startRow,
+//         args->maxIterations,
+//         args->output);
+
+// }
+
 void workerThreadStart(WorkerArgs * const args) {
 
     // TODO FOR CS149 STUDENTS: Implement the body of the worker
@@ -63,9 +86,6 @@ void workerThreadStart(WorkerArgs * const args) {
     // half of the image and thread 1 could compute the bottom half.
     Timer timer(args->threadId);
     printf("Hello world from thread %d\n", args->threadId);
-    // 开始和结束行
-    // int startRow = args->threadId * args->height / args->numThreads;
-    // int endRow = (args->threadId + 1) * args->height / args->numThreads;
     for(unsigned i = args->threadId; i < args->height; i += args->numThreads)   //以1为粒度，让每一个线程都分到近似的计算量
     {
         mandelbrotSerial(args->x0, args->y0, args->x1, args->y1, args->width, args->height, i, 1, args->maxIterations, args->output);
@@ -84,7 +104,7 @@ void mandelbrotThread(
     int maxIterations, int output[])
 {
     // static constexpr int MAX_THREADS = 32;
-    static constexpr int MAX_THREADS = 16;  //修改为我的CPU的线程数
+    static constexpr int MAX_THREADS = 16;  // 9700x
 
     if (numThreads > MAX_THREADS)
     {
