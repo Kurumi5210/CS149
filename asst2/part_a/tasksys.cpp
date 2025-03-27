@@ -44,6 +44,8 @@ void TaskSystemSerial::sync() {
  * ================================================================
  */
 
+// 并行+总是创建线程
+
 const char* TaskSystemParallelSpawn::name() {
     return "Parallel + Always Spawn";
 }

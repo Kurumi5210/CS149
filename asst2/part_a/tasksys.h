@@ -2,6 +2,7 @@
 #define _TASKSYS_H
 
 #include "itasksys.h"
+#include <thread>
 
 /*
  * TaskSystemSerial: This class is the student's implementation of a
@@ -26,6 +27,8 @@ class TaskSystemSerial: public ITaskSystem {
  * of the ITaskSystem interface.
  */
 class TaskSystemParallelSpawn: public ITaskSystem {
+    private:
+        std::vector<std::thread> workers;
     public:
         TaskSystemParallelSpawn(int num_threads);
         ~TaskSystemParallelSpawn();
